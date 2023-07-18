@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dwarf-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dwarf-app-updated
+  template:
+    metadata:
+      labels:
+        app: dwarf-app-updated
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - dwarf-app-updated
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: dwarf-app-updated
+          image: dwarf-app:6.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          # command:
+          #   - sh
+          #   - -c
+          #   - sysctl -w fs.inotify.max_user_instances=1024
+          ports:
+            - containerPort: 8200
+          volumeMounts:
+          - name: variable-volume
+            mountPath: /app/variables.txt
+      volumes:
+        - name: variable-volume
+          hostPath:
+            path: /home/docker/dwarf-app-file/variables.txt
+      hostNetwork: true

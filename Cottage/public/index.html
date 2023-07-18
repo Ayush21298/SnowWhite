@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cottage Application</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 65%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .title {
+      text-align: center;
+    }
+
+    .sub_title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .input-group {
+      display: flex;
+      margin-bottom: 20px;
+      align-items: center; /* Align items vertically */
+    }
+
+    .input-group input[type="text"] {
+      flex: 1;
+      padding: 5px;
+      font-size: 16px;
+    }
+
+    .input-group label {
+      margin-left: 10px;
+    }
+
+    .input-group button {
+      margin-left: 10px;
+    }
+
+    .output {
+      width: 100%;
+      height: 300px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: scroll;
+    }
+
+    .output pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 14px;
+    }
+
+    .status {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .status .message {
+      font-weight: bold;
+    }
+
+    .status .filename {
+      font-style: italic;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .buttons button {
+      margin: 0 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Cottage Application</h1>
+    <p class="sub_title">Let's cottage our packets...</p>
+    <div class="input-group">
+      <input type="text" autocomplete="off" id="filename" placeholder="Enter file name">
+      <label for="saveToFile">Save to File</label>
+      <input type="checkbox" id="saveToFile" checked>
+      <button id="start">Start</button>
+      <button id="stop">Stop</button>
+    </div>
+    <div class="output">
+      <pre id="output"></pre>
+    </div>
+    <div class="status">
+      <span class="message">Status:</span> <span class="filename" id="status-filename"></span>
+    </div>
+    <div class="buttons">
+      <button id="clear">Clear Output</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const outputPre = document.getElementById('output');
+    const filenameInput = document.getElementById('filename');
+    const saveToFileCheckbox = document.getElementById('saveToFile');
+    const startButton = document.getElementById('start');
+    const stopButton = document.getElementById('stop');
+    const clearButton = document.getElementById('clear');
+    const statusFilename = document.getElementById('status-filename');
+
+    const socket = io();
+    statusFilename.innerText = 'Click on Start or Stop';
+
+    startButton.addEventListener('click', () => {
+      const filename = filenameInput.value.trim();
+      const saveToFile = saveToFileCheckbox.checked;
+      socket.emit('start', { filename, saveToFile });
+      startButton.disabled = true;
+      stopButton.disabled = false;
+      filenameInput.disabled = true;
+      saveToFileCheckbox.disabled = true;
+      statusFilename.innerText = saveToFile ? 'Saving Captured Packets to ' + filename + '.pcap File' : 'Showing Received Packets';
+      if (outputPre.innerText) outputPre.innerText += '\n\n\nStarting TCPDump...\n';
+      else outputPre.innerText = 'Starting TCPDump...\n';
+    });
+
+    stopButton.addEventListener('click', () => {
+      socket.emit('stop');
+      startButton.disabled = false;
+      stopButton.disabled = true;
+      filenameInput.disabled = false;
+      saveToFileCheckbox.disabled = false;
+      statusFilename.innerText = '';
+      statusFilename.innerText = 'Packet Capturing Stopped';
+    });
+
+    clearButton.addEventListener('click', () => {
+      outputPre.innerText = '';
+      statusFilename.innerText = 'Click on Start or Stop';
+    });
+
+    saveToFileCheckbox.addEventListener('change', () => {
+      filenameInput.disabled = !saveToFileCheckbox.checked;
+    });
+
+    socket.on('output', (data) => {
+      outputPre.innerText += data;
+      outputPre.scrollTop = outputPre.scrollHeight;
+      outputPre.scrollIntoView(false);
+    });
+  </script>
+</body>
+</html>

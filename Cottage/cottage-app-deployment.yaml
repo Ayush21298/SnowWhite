@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cottage-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cottage-app
+  template:
+    metadata:
+      labels:
+        app: cottage-app
+    spec:
+      containers:
+        - name: cottage-app-container
+          image: cottage-app:3.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3031
+          securityContext:
+            privileged: true
+      nodeName: multinode-demo-m02
+      hostNetwork: true
