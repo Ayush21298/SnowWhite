@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dwarf-app-daemonset
+  labels:
+    app: dwarf-app-updated
+    ssd: "true"
+spec:
+  selector:
+    matchLabels:
+      app: dwarf-app-updated
+      ssd: "true"
+  template:
+    metadata:
+      labels:
+        app: dwarf-app-updated
+        ssd: "true"
+    spec:
+      nodeSelector:
+        ssd: "true"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - dwarf-app-updated
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: dwarf-app-updated
+          image: dwarf-app:7.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          # command:
+          #   - sh
+          #   - -c
+          #   - sysctl -w fs.inotify.max_user_instances=1024
+          ports:
+            - containerPort: 8201
+          volumeMounts:
+          - name: variable-volume
+            mountPath: /app/variables.txt
+      volumes:
+        - name: variable-volume
+          hostPath:
+            path: /home/docker/dwarf-app-file/variables.txt
+      hostNetwork: true

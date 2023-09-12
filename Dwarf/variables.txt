@@ -1,0 +1,7 @@
+src_ip=""
+dst_ip=""
+src_port=""
+dst_port=""
+proto="1"
+iface="wlx3c3300606d53"
+dst_iface="tun0"

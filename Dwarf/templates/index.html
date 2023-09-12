@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dwarf Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            margin-top: 30px;
+            color: #333333;
+        }
+
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333333;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        input[type="submit"] {
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .status-message {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .variable-list {
+            list-style: none;
+            padding: 0;
+            margin-block-start: -19px;
+            margin-block-end: -25px;
+        }
+
+        .variable-list li {
+            margin-bottom: 10px;
+        }
+
+        .variable-name {
+            font-weight: bold;
+            font-size: large;
+            color: #333333;
+        }
+
+        .variable-value {
+            font-weight: normal;
+            font-size: large;
+        }
+    </style>
+</head>
+<body>
+    <h1>Current Filters</h1>
+    <pre>
+        <ul class="variable-list">
+            <li><span class="variable-name">Source IP:</span> <span class="variable-value">{{ src_ip }}</span></li>
+            <li><span class="variable-name">Destination IP:</span> <span class="variable-value">{{ dst_ip }}</span></li>
+            <li><span class="variable-name">Source Port:</span> <span class="variable-value">{{ src_port }}</span></li>
+            <li><span class="variable-name">Destination Port:</span> <span class="variable-value">{{ dst_port }}</span></li>
+            <li><span class="variable-name">Protocol:</span> <span class="variable-value">{{ proto }}</span></li>
+            <li><span class="variable-name">Interface:</span> <span class="variable-value">{{ iface }}</span></li>
+            <li><span class="variable-name">Destination Interface:</span> <span class="variable-value">{{ dst_iface }}</span></li>
+        </ul>
+    </pre>
+
+    {% if status %}
+    <div class="status-message">{{ status }}</div>
+    {% endif %}
+
+    <h1>Update Filters</h1>
+    <form method="POST" action="/update_variables">
+        <div class="form-group">
+            <label for="src_ip">Source IP:</label>
+            <input type="text" id="src_ip" name="src_ip" value="{{ src_ip }}">
+        </div>
+
+        <div class="form-group">
+            <label for="dst_ip">Destination IP:</label>
+            <input type="text" id="dst_ip" name="dst_ip" value="{{ dst_ip }}">
+        </div>
+
+        <div class="form-group">
+            <label for="src_port">Source Port:</label>
+            <input type="text" id="src_port" name="src_port" value="{{ src_port }}">
+        </div>
+
+        <div class="form-group">
+            <label for="dst_port">Destination Port:</label>
+            <input type="text" id="dst_port" name="dst_port" value="{{ dst_port }}">
+        </div>
+
+        <div class="form-group">
+            <label for="proto">Protocol:</label>
+            <input type="text" id="proto" name="proto" value="{{ proto }}">
+        </div>
+
+        <div class="form-group">
+            <label for="iface">Interface:</label>
+            <input type="text" id="iface" name="iface" value="{{ iface }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="dst_iface">Destination Interface:</label>
+            <input type="text" id="dst_iface" name="dst_iface" value="{{ dst_iface }}" required>
+        </div>
+
+        <input type="submit" value="Update">
+    </form>
+</body>
+</html>
